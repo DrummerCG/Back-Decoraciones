@@ -10,6 +10,13 @@ const pool = mariadb.createPool({
     connectionLimit: 5, // Límite de conexiones simultáneas
 });
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Cambia esto al dominio de tu aplicación React
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 app.get('/productos', async(req, res) => {
     try {
         const conn = await pool.getConnection();
@@ -22,7 +29,7 @@ app.get('/productos', async(req, res) => {
     }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`La aplicación está escuchando en el puerto ${port}`);
 });
