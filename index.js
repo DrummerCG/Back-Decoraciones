@@ -17,10 +17,23 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/productos', async(req, res) => {
+app.get('/productos', async (req, res) => {
     try {
         const conn = await pool.getConnection();
-        const rows = await conn.query('SELECT * FROM producto');
+        const [rows] = await conn.query(`SELECT 
+        product.id, 
+        product.name, 
+        product.description AS product_description, 
+        reference.id AS reference_id, 
+        reference.size, 
+        reference.price, 
+        reference.main, 
+        reference.description AS reference_description,
+        GROUP_CONCAT(reference_image.url) AS image_urls
+    FROM product    
+    JOIN reference ON product.id = reference.product_id
+    LEFT JOIN reference_image ON reference.id = reference_image.reference_id
+    GROUP BY product.id, reference.id;`);
         conn.end();
         res.json(rows);
     } catch (err) {
@@ -31,5 +44,5 @@ app.get('/productos', async(req, res) => {
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log(`La aplicación está escuchando en el puerto ${port}`);
+    console.log(`La aplicación está escuchando en el puerto ${port}`);
 });

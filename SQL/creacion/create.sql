@@ -1,15 +1,22 @@
-CREATE TABLE producto (
+CREATE TABLE product (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    descripcion TEXT
+    name VARCHAR(255) NOT NULL,
+    description TEXT
 );
 
-CREATE TABLE referencia (
+CREATE TABLE reference (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  tamano DECIMAL (10,5),
-  precio DECIMAL (10,5),
-  principal TINYINT(1),
-  descripcion TEXT,
-  producto_id INT NOT NULL,
-  FOREIGN KEY (producto_id) REFERENCES producto(id) ON DELETE CASCADE
+  size DECIMAL (10,5),
+  price DECIMAL (10,5),
+  main TINYINT(1),
+  description TEXT,
+  product_id INT NOT NULL,
+  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
+);
+
+CREATE TABLE reference_image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  url VARCHAR(255),
+  reference_id INT NOT NULL,
+  FOREIGN KEY (reference_id) REFERENCES reference(id) ON DELETE CASCADE
 );
