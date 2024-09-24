@@ -20,20 +20,14 @@ app.use((req, res, next) => {
 app.get('/productos', async (req, res) => {
     try {
         const conn = await pool.getConnection();
-        const [rows] = await conn.query(`SELECT 
-        product.id, 
-        product.name, 
-        product.description AS product_description, 
-        reference.id AS reference_id, 
-        reference.size, 
-        reference.price, 
-        reference.main, 
-        reference.description AS reference_description,
-        GROUP_CONCAT(reference_image.url) AS image_urls
-    FROM product    
-    JOIN reference ON product.id = reference.product_id
-    LEFT JOIN reference_image ON reference.id = reference_image.reference_id
-    GROUP BY product.id, reference.id;`);
+        const [rows] = await conn.query(`SELECT productos.id as id_producto, productos.Nombre, productos.Descripcion as descripcion_principal, productos.Url_imagen AS Url_imagen_default, 
+        inventario.id as inventario_id, inventario.Color, inventario.Diseño, inventario.Calidad, inventario.Tamaño, inventario.Stock, inventario.Url_imagen, inventario.Descripcion, inventario.Ancho, inventario.Alto, inventario.Largo,
+        proveedor.*
+        FROM productos
+        LEFT JOIN inventario ON productos.id = inventario.ID_Productos
+        LEFT JOIN inventario_y_proveedor ON inventario.id = inventario_y_proveedor.id_inventario
+        LEFT JOIN proveedor ON inventario_y_proveedor.id_proveedor = proveedor.id
+        WHERE inventario.Stock > 0;`);
         conn.end();
         res.json(rows);
     } catch (err) {
