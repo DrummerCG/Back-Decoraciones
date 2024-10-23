@@ -1,0 +1,25 @@
+{
+  "name": "back-decoraciones",
+  "version": "1.0.0",
+  "description": "Backend creado en Node para el aplicativo de ventas de la empresa DECORACIONES ORTIZ (Sena)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrummerCG/Back-Decoraciones.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DrummerCG/Back-Decoraciones/issues"
+  },
+  "homepage": "https://github.com/DrummerCG/Back-Decoraciones#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mariadb": "^3.3.0",
+    "nodemailer": "^6.9.15"
+  }
+}
