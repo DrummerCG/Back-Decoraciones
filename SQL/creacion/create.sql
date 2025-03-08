@@ -21,19 +21,19 @@ CREATE TABLE reference_image (
   FOREIGN KEY (reference_id) REFERENCES reference(id) ON DELETE CASCADE
 );
 
-CREATE TABLE request (
+CREATE TABLE solicitud (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  request_type VARCHAR(255) NOT NULL, 
-  fullname VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  phone VARCHAR(255) NOT NULL,
-  address VARCHAR(255),
-  product_name VARCHAR(255),
-  reference_id INT,
-  serial_number VARCHAR(255),
-  invoice_id VARCHAR(255),
-  reason TEXT,
-  status VARCHAR(255) DEFAULT 'PENDING',
-  images_base64 LONGTEXT
+  fecha_solicitud TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  tipo_solicitud VARCHAR(255) NOT NULL, 
+  nombre_completo VARCHAR(255) NOT NULL,
+  correo_electronico VARCHAR(255) NOT NULL,
+  telefono VARCHAR(255) NOT NULL,
+  direccion VARCHAR(255),
+  nombre_producto VARCHAR(255),
+  id_referencia INT,
+  numero_serie VARCHAR(255),
+  id_factura VARCHAR(255),
+  motivo TEXT,
+  estado VARCHAR(255) DEFAULT 'PENDIENTE',
+  imagenes_base64 LONGTEXT
 );

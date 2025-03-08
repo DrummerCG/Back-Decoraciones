@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-09-2024 a las 08:00:21
+-- Tiempo de generación: 08-03-2025 a las 05:27:34
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -134,8 +134,8 @@ CREATE TABLE `envios` (
   `Correo` varchar(30) NOT NULL,
   `Direccion Envio` varchar(20) NOT NULL,
   `Estado` varchar(20) NOT NULL,
-  `Fecha Envio` datetime(10) NOT NULL,
-  `Fecha Entrega` datetime(10) NOT NULL,
+  `Fecha Envio` datetime(6) NOT NULL,
+  `Fecha Entrega` datetime(6) NOT NULL,
   `ID_Vendedor` int(11) NOT NULL,
   `ID_Estado De Envio` int(11) NOT NULL,
   `ID_Pedidos` int(11) NOT NULL
@@ -279,6 +279,37 @@ INSERT INTO `proveedor` (`id`, `Cargo`, `ID_Contacto_empresa`, `ID_Contacto_repr
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `solicitud`
+--
+
+CREATE TABLE `solicitud` (
+  `id` int(11) NOT NULL,
+  `fecha_solicitud` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tipo_solicitud` varchar(255) NOT NULL,
+  `nombre_completo` varchar(255) NOT NULL,
+  `correo_electronico` varchar(255) NOT NULL,
+  `telefono` varchar(255) NOT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `nombre_producto` varchar(255) DEFAULT NULL,
+  `id_referencia` int(11) DEFAULT NULL,
+  `numero_serie` varchar(255) DEFAULT NULL,
+  `id_factura` varchar(255) DEFAULT NULL,
+  `motivo` text DEFAULT NULL,
+  `estado` varchar(255) DEFAULT 'PENDIENTE',
+  `imagenes_base64` longtext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `solicitud`
+--
+
+INSERT INTO `solicitud` (`id`, `fecha_solicitud`, `tipo_solicitud`, `nombre_completo`, `correo_electronico`, `telefono`, `direccion`, `nombre_producto`, `id_referencia`, `numero_serie`, `id_factura`, `motivo`, `estado`, `imagenes_base64`) VALUES
+(1, '2025-03-08 03:14:32', 'instalacion', 'santiago quiroz upegui', 'squirozu@unal.edu.co', '3002312301', 'carrera54A #63-10', NULL, NULL, NULL, NULL, 'me quede sin decoraciones :c', 'PENDIENTE', NULL),
+(2, '2025-03-08 04:04:08', 'instalacion', 'santiago helicoptero quiroz upegui', 'squirozu@unal.edu.co', '3002312301', 'carrera 54a #63-10', NULL, NULL, NULL, NULL, 'me quede sin instalación, ayudita', 'PENDIENTE', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuario`
 --
 
@@ -370,7 +401,8 @@ ALTER TABLE `inventario`
 -- Indices de la tabla `inventario_y_proveedor`
 --
 ALTER TABLE `inventario_y_proveedor`
-  ADD PRIMARY KEY (`id_proveedor`,`id_inventario`);
+  ADD PRIMARY KEY (`id_proveedor`,`id_inventario`),
+  ADD KEY `inventario_y_proveedor_ibfk_2` (`id_inventario`);
 
 --
 -- Indices de la tabla `pagos`
@@ -403,6 +435,12 @@ ALTER TABLE `proveedor`
   ADD PRIMARY KEY (`id`),
   ADD KEY `proveedor-empresa` (`ID_Contacto_empresa`),
   ADD KEY `proveedor-representante` (`ID_Contacto_representante`);
+
+--
+-- Indices de la tabla `solicitud`
+--
+ALTER TABLE `solicitud`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `usuario`
@@ -469,6 +507,12 @@ ALTER TABLE `productos`
 --
 ALTER TABLE `proveedor`
   MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `solicitud`
+--
+ALTER TABLE `solicitud`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `vendedor`
