@@ -1,19 +1,19 @@
 const mariadb = require('mariadb');
 const express = require('express');
 const nodemailer = require('nodemailer');
+const cors = require('cors');
 const app = express();
-
-// Middleware para manejar JSON en el cuerpo de las solicitudes
-app.use(express.json());
+app.use(express.json()); // Middleware para manejar JSON en el cuerpo de las solicitudes
 
 const pool = mariadb.createPool({
-    host: 'localhost', // Cambia esto al host de tu base de datos
+    host: '127.0.0.1', 
     user: 'root',
     password: '',
     database: 'decoraciones',
     connectionLimit: 5, // Límite de conexiones simultáneas
 });
 
+// Middleware para manejar CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Cambia esto al dominio de tu aplicación React
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -21,6 +21,115 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(cors()); // Permitir todas las solicitudes CORS
+
+// Ruta para crear una nueva factura
+app.post('/facturas', async (req, res) => {
+    const { cliente_id, productos } = req.body;
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        await conn.beginTransaction();
+
+        const result = await conn.query('INSERT INTO factura (fecha, cliente_id, total) VALUES (CURDATE(), ?, 0)', [cliente_id]);
+        const facturaId = result.insertId;
+
+        let total = 0;
+        for (const producto of productos) {
+            const { producto_id, cantidad, precio } = producto;
+            await conn.query('INSERT INTO detalle_factura (factura_id, producto_id, cantidad, precio) VALUES (?, ?, ?, ?)', [facturaId, producto_id, cantidad, precio]);
+            total += cantidad * precio;
+        }
+
+        await conn.query('UPDATE factura SET total = ? WHERE id = ?', [total, facturaId]);
+        await conn.commit();
+        res.status(201).json({ facturaId });
+    } catch (err) {
+        if (conn) await conn.rollback();
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (conn) conn.release();
+    }
+});
+
+// Ruta para obtener una factura por ID
+app.get('/facturas/:id', async (req, res) => {
+    const { id } = req.params;
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const factura = await conn.query('SELECT * FROM factura WHERE id = ?', [id]);
+        const detalles = await conn.query('SELECT * FROM detalle_factura WHERE factura_id = ?', [id]);
+        res.json({ factura: factura[0], detalles });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (conn) conn.release();
+    }
+});
+
+// Ruta para actualizar una factura
+app.put('/facturas/:id', async (req, res) => {
+    const { id } = req.params;
+    const { cliente_id, productos, total } = req.body;
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        await conn.beginTransaction();
+
+        await conn.query('UPDATE factura SET cliente_id = ?, total = ? WHERE id = ?', [cliente_id, total, id]);
+
+        await conn.query('DELETE FROM detalle_factura WHERE factura_id = ?', [id]);
+        for (const producto of productos) {
+            const { producto_id, cantidad, precio } = producto;
+            await conn.query('INSERT INTO detalle_factura (factura_id, producto_id, cantidad, precio) VALUES (?, ?, ?, ?)', [id, producto_id, cantidad, precio]);
+        }
+
+        await conn.commit();
+        res.status(200).json({ message: 'Factura actualizada' });
+    } catch (err) {
+        if (conn) await conn.rollback();
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (conn) conn.release();
+    }
+});
+
+// Ruta para eliminar una factura
+app.delete('/facturas/:id', async (req, res) => {
+    const { id } = req.params;
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        await conn.beginTransaction();
+
+        await conn.query('DELETE FROM detalle_factura WHERE factura_id = ?', [id]);
+        await conn.query('DELETE FROM factura WHERE id = ?', [id]);
+
+        await conn.commit();
+        res.status(200).json({ message: 'Factura eliminada' });
+    } catch (err) {
+        if (conn) await conn.rollback();
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (conn) conn.release();
+    }
+});
+
+// Ruta para obtener la última factura creada
+app.get('/facturas/ultima', async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const [factura] = await conn.query('SELECT * FROM factura ORDER BY id DESC LIMIT 1');
+        const detalles = await conn.query('SELECT * FROM detalle_factura WHERE factura_id = ?', [factura.id]);
+        res.json({ factura, detalles });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (conn) conn.release();
+    }
+});
 
 app.get('/productos', async (req, res) => {
     try {
@@ -66,8 +175,8 @@ app.post('/usuarios/registro', async (req, res) => {
         if (existingContact?.length === 0) {
             // Insert new contact info
             await conn.query(
-                `INSERT INTO contacto (Id, Tipo_id, Nombre, Telefono, Correo, Direccion, Ciudad, Departamento, Pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [id, id_type, name, phone, email, address, neighborhood, city, state, country]
+                `INSERT INTO contacto (Id, Tipo_id, Nombre, Telefono, Correo, Direccion, Ciudad, Departamento, Barrio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [id, id_type, name, phone, email, address, neighborhood, city, state]
             );
         }
 
@@ -97,13 +206,13 @@ const enviarCorreoVerificacion = async (email) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'tuemail@gmail.com', // Cambia esto a tu correo
-            pass: 'tucontraseña', // Cambia esto a tu contraseña
+            user: 'tuemail@gmail.com', // Cambia esto a el correo
+            pass: 'tucontraseña', // Cambia esto a la contraseña
         },
     });
 
     let mailOptions = {
-        from: 'tuemail@gmail.com', // Cambia esto a tu correo
+        from: 'tuemail@gmail.com', // Cambia esto al correo
         to: email,
         subject: 'Verificación de correo electrónico',
         html: `
@@ -112,7 +221,7 @@ const enviarCorreoVerificacion = async (email) => {
                     <p>Gracias por registrarte. Por favor, haz clic en el botón de abajo para verificar tu correo electrónico.</p>
                     <a href="http://localhost:3000/verificar?email=${email}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Verificar Correo</a>
                     <p>Si no te has registrado en nuestro sitio, por favor ignora este correo.</p>
-                    <p>Saludos,<br>El equipo de Decoraciones</p>
+                    <p>Saludos,<br>El equipo de Decoraciones Ortiz</p>
                 </div>
             `,
     };
@@ -136,7 +245,6 @@ app.post('/solicitudes', async (req, res) => {
             direccion,
             nombre_producto,
             id_referencia,
-            numero_serie,
             id_factura,
             motivo,
             estado,
@@ -152,7 +260,6 @@ app.post('/solicitudes', async (req, res) => {
                 direccion,
                 nombre_producto,
                 id_referencia,
-                numero_serie,
                 id_factura,
                 motivo,
                 estado,
@@ -165,8 +272,7 @@ app.post('/solicitudes', async (req, res) => {
                 telefono,
                 direccion,
                 nombre_producto,
-                id_referencia,
-                numero_serie,
+                id_referencia,            
                 id_factura,
                 motivo,
                 estado || 'PENDIENTE',
