@@ -333,36 +333,6 @@ CREATE TABLE `vendedor` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `factura`
---
-
-CREATE TABLE `factura` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `fecha` DATE NOT NULL,
-  `cliente_id` INT NOT NULL,
-  `total` DECIMAL(10, 2) NOT NULL,
-  FOREIGN KEY (`cliente_id`) REFERENCES `cliente`(`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `detalle_factura`
---
-
-CREATE TABLE `detalle_factura` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `factura_id` INT NOT NULL,
-  `producto_id` INT NOT NULL,
-  `cantidad` INT NOT NULL,
-  `precio` DECIMAL(10, 2) NOT NULL,
-  FOREIGN KEY (`factura_id`) REFERENCES `factura`(`id`),
-  FOREIGN KEY (`producto_id`) REFERENCES `productos`(`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Índices para tablas volcadas
 --
 
@@ -639,3 +609,34 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+--
+-- Estructura de tabla para la tabla `factura`
+--
+
+CREATE TABLE `factura` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `fecha` DATE NOT NULL,
+  `cliente_id` INT NOT NULL,
+  `total` DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (`cliente_id`) REFERENCES `cliente`(`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_factura`
+--
+
+CREATE TABLE `detalle_factura` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `factura_id` INT NOT NULL,
+  `producto_id` INT NOT NULL,
+  `cantidad` INT NOT NULL,
+  `precio` DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (`factura_id`) REFERENCES `factura`(`id`),
+  FOREIGN KEY (`producto_id`) REFERENCES `productos`(`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
