@@ -11,6 +11,8 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+USE `decoraciones`;
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -27,6 +29,8 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `administrador`
 --
 
+DROP TABLE IF EXISTS `administrador`;
+
 CREATE TABLE `administrador` (
   `Id` int(30) NOT NULL,
   `ID_Contacto` varchar(30) NOT NULL
@@ -37,6 +41,8 @@ CREATE TABLE `administrador` (
 --
 -- Estructura de tabla para la tabla `carrito_compras`
 --
+
+DROP TABLE IF EXISTS `carrito_compras`;
 
 CREATE TABLE `carrito_compras` (
   `Id` int(11) NOT NULL,
@@ -53,6 +59,8 @@ CREATE TABLE `carrito_compras` (
 --
 -- Estructura de tabla para la tabla `categoria`
 --
+
+DROP TABLE IF EXISTS `categoria`;
 
 CREATE TABLE `categoria` (
   `id` varchar(20) NOT NULL
@@ -71,6 +79,8 @@ INSERT INTO `categoria` (`id`) VALUES
 --
 -- Estructura de tabla para la tabla `categoria_y_producto`
 --
+
+DROP TABLE IF EXISTS `categoria_y_producto`;
 
 CREATE TABLE `categoria_y_producto` (
   `ID_Productos` int(11) NOT NULL,
@@ -91,6 +101,8 @@ INSERT INTO `categoria_y_producto` (`ID_Productos`, `ID_Categoria`) VALUES
 -- Estructura de tabla para la tabla `cliente`
 --
 
+DROP TABLE IF EXISTS `cliente`;
+
 CREATE TABLE `cliente` (
   `Id` int(11) NOT NULL,
   `ID_Contacto` varchar(30) DEFAULT NULL
@@ -102,23 +114,28 @@ CREATE TABLE `cliente` (
 -- Estructura de tabla para la tabla `contacto`
 --
 
+DROP TABLE IF EXISTS `contacto`;
+
 CREATE TABLE `contacto` (
-  `Id` varchar(30) NOT NULL,
-  `Tipo_id` varchar(20) NOT NULL,
-  `Telefono` int(25) NOT NULL,
-  `Correo` varchar(25) DEFAULT NULL,
-  `Direccion` varchar(20) NOT NULL,
-  `Ciudad` varchar(25) NOT NULL,
-  `Departamento` varchar(25) NOT NULL
+  `Id` VARCHAR(50) NOT NULL, 
+  `Tipo_id` VARCHAR(20) NOT NULL,
+  `Telefono` VARCHAR(20) NOT NULL, 
+  `Correo` VARCHAR(255) DEFAULT NULL,
+  `Direccion` VARCHAR(255) NOT NULL, 
+  `Ciudad` VARCHAR(100) NOT NULL,
+  `Departamento` VARCHAR(100) NOT NULL,
+  `Nacionalidad` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `contacto`
 --
 
-INSERT INTO `contacto` (`Id`, `Tipo_id`, `Telefono`, `Correo`, `Direccion`, `Ciudad`, `Departamento`) VALUES
-('1036678350', 'CC', 300231230, 'santiqupgui@gmail.com', 'carrera 54A #63-10', 'itagui', 'Antioquia'),
-('9010193734', 'NIT', 316812037, 'contacto@experimentailty.', 'calle 16 #45-85', 'Medellin', 'Antioquia');
+INSERT INTO `contacto` (`Id`, `Tipo_id`, `Telefono`, `Correo`, `Direccion`, `Ciudad`, `Departamento`, `Country`) VALUES
+('1036678350', 'CC', 300231230, 'santiqupgui@gmail.com', 'carrera 54A #63-10', 'itagui', 'Antioquia', 'Colombia'),
+('9010193734', 'NIT', 316812037, 'contacto@experimentailty.', 'calle 16 #45-85', 'Medellin', 'Antioquia', 'Colombia'),
+('1036678350', 'CC', 3001234567, 'juan.perez@example.com', 'Calle 123 #45-67', 'Bogotá', 'Cundinamarca', 'Colombia');
 
 -- --------------------------------------------------------
 
@@ -126,20 +143,33 @@ INSERT INTO `contacto` (`Id`, `Tipo_id`, `Telefono`, `Correo`, `Direccion`, `Ciu
 -- Estructura de tabla para la tabla `envios`
 --
 
+DROP TABLE IF EXISTS `envios`;
+
 CREATE TABLE `envios` (
-  `Id` int(11) NOT NULL,
-  `Nombres` varchar(20) NOT NULL,
-  `Apellidos` varchar(20) NOT NULL,
-  `Cedula` varchar(10) NOT NULL,
-  `Correo` varchar(30) NOT NULL,
-  `Direccion Envio` varchar(20) NOT NULL,
-  `Estado` varchar(20) NOT NULL,
-  `Fecha Envio` datetime(6) NOT NULL,
-  `Fecha Entrega` datetime(6) NOT NULL,
-  `ID_Vendedor` int(11) NOT NULL,
-  `ID_Estado De Envio` int(11) NOT NULL,
-  `ID_Pedidos` int(11) NOT NULL
+  `Id` INT AUTO_INCREMENT PRIMARY KEY, -- Clave primaria con AUTO_INCREMENT
+  `Nombres` VARCHAR(100) NOT NULL, -- Aumentado a 100 caracteres para nombres largos
+  `Apellidos` VARCHAR(100) NOT NULL, -- Aumentado a 100 caracteres para apellidos largos
+  `Cedula` VARCHAR(20) NOT NULL, -- Aumentado a 20 caracteres para mayor flexibilidad
+  `Correo` VARCHAR(255) NOT NULL, -- Aumentado a 255 caracteres para correos largos
+  `Direccion_Envio` VARCHAR(255) NOT NULL, -- Aumentado a 255 caracteres para direcciones completas
+  `Estado` ENUM('En tránsito', 'Entregado', 'Cancelado') NOT NULL DEFAULT 'En tránsito', -- Usar ENUM para estados predefinidos
+  `Country` VARCHAR(100) NOT NULL, -- Mantener 100 caracteres para el país
+  `Fecha_Envio` DATETIME(6) NOT NULL, -- Fecha y hora del envío
+  `Fecha_Entrega` DATETIME(6) DEFAULT NULL, -- Fecha y hora de la entrega (puede ser NULL si no se ha entregado)
+  `ID_Vendedor` INT NOT NULL, -- Relación con la tabla `vendedor`
+  `ID_Estado_De_Envio` INT NOT NULL, -- Relación con la tabla `estado de envio`
+  `ID_Pedidos` INT NOT NULL, -- Relación con la tabla `pedidos`
+  FOREIGN KEY (`ID_Vendedor`) REFERENCES `vendedor`(`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`ID_Estado_De_Envio`) REFERENCES `estado de envio`(`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`ID_Pedidos`) REFERENCES `pedidos`(`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `envios`
+--
+
+INSERT INTO `envios` (`Nombres`, `Apellidos`, `Cedula`, `Correo`, `Direccion_Envio`, `Estado`, `Country`, `Fecha_Envio`, `Fecha_Entrega`, `ID_Vendedor`, `ID_Estado_De_Envio`, `ID_Pedidos`) VALUES 
+('Juan', 'Pérez', '123456789', 'juan.perez@example.com', 'Calle 123 #45-67', 'En tránsito', 'Colombia', '2025-03-08 10:00:00', '2025-03-10 15:00:00', 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -147,7 +177,9 @@ CREATE TABLE `envios` (
 -- Estructura de tabla para la tabla `estado de envio`
 --
 
-CREATE TABLE `estado de envio` (
+DROP TABLE IF EXISTS `estado_de_envio`;
+
+CREATE TABLE `estado_de_envio` (
   `Id` int(11) NOT NULL,
   `Numero De Guia` varchar(20) NOT NULL,
   `Bodega` varchar(20) NOT NULL,
@@ -162,20 +194,23 @@ CREATE TABLE `estado de envio` (
 -- Estructura de tabla para la tabla `inventario`
 --
 
+DROP TABLE IF EXISTS `inventario`;
+
 CREATE TABLE `inventario` (
-  `id` int(15) NOT NULL,
-  `Color` varchar(50) NOT NULL,
-  `Diseño` varchar(20) NOT NULL,
-  `Calidad` varchar(30) NOT NULL,
-  `Tamaño` varchar(20) DEFAULT NULL,
-  `Stock` int(30) NOT NULL,
-  `precio` double NOT NULL,
-  `ID_Productos` int(11) NOT NULL,
-  `Url_imagen` text DEFAULT NULL,
-  `Descripcion` text DEFAULT NULL,
-  `Ancho` double DEFAULT NULL,
-  `Alto` double DEFAULT NULL,
-  `Largo` double DEFAULT NULL
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `Color` VARCHAR(50) NOT NULL,
+  `Diseño` VARCHAR(50) NOT NULL, 
+  `Calidad` VARCHAR(50) NOT NULL, 
+  `Tamaño` VARCHAR(50) DEFAULT NULL,
+  `Stock` INT NOT NULL,
+  `precio` DOUBLE NOT NULL,
+  `ID_Productos` INT NOT NULL,
+  `Url_imagen` TEXT DEFAULT NULL,
+  `Descripcion` TEXT DEFAULT NULL,
+  `Ancho` DOUBLE DEFAULT NULL,
+  `Alto` DOUBLE DEFAULT NULL,
+  `Largo` DOUBLE DEFAULT NULL,
+  FOREIGN KEY (`ID_Productos`) REFERENCES `productos`(`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -190,6 +225,8 @@ INSERT INTO `inventario` (`id`, `Color`, `Diseño`, `Calidad`, `Tamaño`, `Stock
 --
 -- Estructura de tabla para la tabla `inventario_y_proveedor`
 --
+
+DROP TABLE IF EXISTS `inventario_y_proveedor`;
 
 CREATE TABLE `inventario_y_proveedor` (
   `id_proveedor` int(15) NOT NULL,
@@ -210,6 +247,8 @@ INSERT INTO `inventario_y_proveedor` (`id_proveedor`, `id_inventario`, `costo`) 
 -- Estructura de tabla para la tabla `pagos`
 --
 
+DROP TABLE IF EXISTS `pagos`;
+
 CREATE TABLE `pagos` (
   `Id` int(11) NOT NULL,
   `Fecha Pagos` datetime(6) NOT NULL,
@@ -223,6 +262,8 @@ CREATE TABLE `pagos` (
 --
 -- Estructura de tabla para la tabla `pedidos`
 --
+
+DROP TABLE IF EXISTS `pedidos`;
 
 CREATE TABLE `pedidos` (
   `Id` int(11) NOT NULL,
@@ -241,11 +282,13 @@ CREATE TABLE `pedidos` (
 -- Estructura de tabla para la tabla `productos`
 --
 
+DROP TABLE IF EXISTS `productos`;
+
 CREATE TABLE `productos` (
-  `Id` int(11) NOT NULL,
-  `Nombre` varchar(20) NOT NULL,
-  `Descripcion` varchar(30) NOT NULL,
-  `Url_imagen` text NOT NULL
+  `Id` INT AUTO_INCREMENT PRIMARY KEY,
+  `Nombre` VARCHAR(100) NOT NULL,
+  `Descripcion` TEXT NOT NULL,
+  `Url_imagen` TEXT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -262,11 +305,15 @@ INSERT INTO `productos` (`Id`, `Nombre`, `Descripcion`, `Url_imagen`) VALUES
 -- Estructura de tabla para la tabla `proveedor`
 --
 
+DROP TABLE IF EXISTS `proveedor`;
+
 CREATE TABLE `proveedor` (
-  `id` int(30) NOT NULL,
-  `Cargo` varchar(30) NOT NULL,
-  `ID_Contacto_empresa` varchar(30) NOT NULL,
-  `ID_Contacto_representante` varchar(30) NOT NULL
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `Cargo` VARCHAR(100) NOT NULL,
+  `ID_Contacto_empresa` VARCHAR(50) NOT NULL,
+  `ID_Contacto_representante` VARCHAR(50) NOT NULL,
+  FOREIGN KEY (`ID_Contacto_empresa`) REFERENCES `contacto`(`Id`),
+  FOREIGN KEY (`ID_Contacto_representante`) REFERENCES `contacto`(`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -282,28 +329,29 @@ INSERT INTO `proveedor` (`id`, `Cargo`, `ID_Contacto_empresa`, `ID_Contacto_repr
 -- Estructura de tabla para la tabla `solicitud`
 --
 
+DROP TABLE IF EXISTS `solicitud`;
+
 CREATE TABLE `solicitud` (
-  `id` int(11) NOT NULL,
-  `fecha_solicitud` timestamp NOT NULL DEFAULT current_timestamp(),
-  `tipo_solicitud` varchar(255) NOT NULL,
-  `nombre_completo` varchar(255) NOT NULL,
-  `correo_electronico` varchar(255) NOT NULL,
-  `telefono` varchar(255) NOT NULL,
-  `direccion` varchar(255) DEFAULT NULL,
-  `nombre_producto` varchar(255) DEFAULT NULL,
-  `id_referencia` int(11) DEFAULT NULL,
-  `numero_serie` varchar(255) DEFAULT NULL,
-  `id_factura` varchar(255) DEFAULT NULL,
-  `motivo` text DEFAULT NULL,
-  `estado` varchar(255) DEFAULT 'PENDIENTE',
-  `imagenes_base64` longtext DEFAULT NULL
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `fecha_solicitud` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+  `tipo_solicitud` VARCHAR(100) NOT NULL, 
+  `nombre_completo` VARCHAR(255) NOT NULL,
+  `correo_electronico` VARCHAR(255) NOT NULL,
+  `telefono` VARCHAR(50) NOT NULL, 
+  `direccion` VARCHAR(255) DEFAULT NULL,
+  `nombre_producto` VARCHAR(255) DEFAULT NULL,
+  `id_factura` INT DEFAULT NULL,
+  `motivo` TEXT DEFAULT NULL,
+  `estado` VARCHAR(50) DEFAULT 'PENDIENTE', 
+  `imagenes_base64` LONGTEXT DEFAULT NULL,
+  FOREIGN KEY (`id_factura`) REFERENCES `factura`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `solicitud`
 --
 
-INSERT INTO `solicitud` (`id`, `fecha_solicitud`, `tipo_solicitud`, `nombre_completo`, `correo_electronico`, `telefono`, `direccion`, `nombre_producto`, `id_referencia`, `numero_serie`, `id_factura`, `motivo`, `estado`, `imagenes_base64`) VALUES
+INSERT INTO `solicitud` (`id`, `fecha_solicitud`, `tipo_solicitud`, `nombre_completo`, `correo_electronico`, `telefono`, `direccion`, `nombre_producto`, `id_factura`, `motivo`, `estado`, `imagenes_base64`) VALUES
 (1, '2025-03-08 03:14:32', 'instalacion', 'santiago quiroz upegui', 'squirozu@unal.edu.co', '3002312301', 'carrera54A #63-10', NULL, NULL, NULL, NULL, 'me quede sin decoraciones :c', 'PENDIENTE', NULL),
 (2, '2025-03-08 04:04:08', 'instalacion', 'santiago helicoptero quiroz upegui', 'squirozu@unal.edu.co', '3002312301', 'carrera 54a #63-10', NULL, NULL, NULL, NULL, 'me quede sin instalación, ayudita', 'PENDIENTE', NULL);
 
@@ -313,10 +361,15 @@ INSERT INTO `solicitud` (`id`, `fecha_solicitud`, `tipo_solicitud`, `nombre_comp
 -- Estructura de tabla para la tabla `usuario`
 --
 
+DROP TABLE IF EXISTS `usuario`;
+
 CREATE TABLE `usuario` (
-  `correo` varchar(30) NOT NULL,
-  `contraseña` varchar(30) NOT NULL,
-  `ID_Contacto` varchar(30) NOT NULL
+  `correo` VARCHAR(255) NOT NULL, 
+  `contraseña` VARCHAR(255) NOT NULL, 
+  `ID_Contacto` VARCHAR(50) NOT NULL,
+  `Verificado` BOOLEAN DEFAULT FALSE, 
+  PRIMARY KEY (`correo`),
+  FOREIGN KEY (`ID_Contacto`) REFERENCES `contacto`(`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -324,6 +377,8 @@ CREATE TABLE `usuario` (
 --
 -- Estructura de tabla para la tabla `vendedor`
 --
+
+DROP TABLE IF EXISTS `vendedor`;
 
 CREATE TABLE `vendedor` (
   `Id` int(30) NOT NULL,
@@ -353,6 +408,8 @@ ALTER TABLE `carrito_compras`
 --
 -- Indices de la tabla `categoria`
 --
+ALTER TABLE otra_tabla DROP FOREIGN KEY fk_categoria;
+DROP TABLE IF EXISTS categoria;
 ALTER TABLE `categoria`
   ADD PRIMARY KEY (`id`);
 
@@ -366,6 +423,7 @@ ALTER TABLE `categoria_y_producto`
 --
 -- Indices de la tabla `cliente`
 --
+ALTER TABLE otra_tabla ADD CONSTRAINT nombre_de_la_clave_foranea FOREIGN KEY (cliente_id) REFERENCES cliente(id);
 ALTER TABLE `cliente`
   ADD PRIMARY KEY (`Id`),
   ADD KEY `ID_Contacto` (`ID_Contacto`);
