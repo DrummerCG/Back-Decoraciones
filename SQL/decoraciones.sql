@@ -45,7 +45,7 @@ CREATE TABLE `administrador` (
 DROP TABLE IF EXISTS `carrito_compras`;
 
 CREATE TABLE `carrito_compras` (
-  `Id` int(11) NOT NULL,
+  `Id` int(30) NOT NULL,
   `Producto` varchar(100) NOT NULL,
   `Fecha_Creacion` datetime(6) NOT NULL,
   `Cantidad` varchar(100) NOT NULL,
@@ -83,7 +83,7 @@ INSERT INTO `categoria` (`id`) VALUES
 DROP TABLE IF EXISTS `categoria_y_producto`;
 
 CREATE TABLE `categoria_y_producto` (
-  `ID_Productos` int(11) NOT NULL,
+  `ID_Productos` int(15) NOT NULL,
   `ID_Categoria` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -104,7 +104,7 @@ INSERT INTO `categoria_y_producto` (`ID_Productos`, `ID_Categoria`) VALUES
 DROP TABLE IF EXISTS `cliente`;
 
 CREATE TABLE `cliente` (
-  `Id` int(11) NOT NULL,
+  `Id` int(15) NOT NULL,
   `ID_Contacto` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -180,7 +180,7 @@ INSERT INTO `envios` (`Nombres`, `Apellidos`, `Cedula`, `Correo`, `Direccion_Env
 DROP TABLE IF EXISTS `estado_de_envio`;
 
 CREATE TABLE `estado_de_envio` (
-  `Id` int(11) NOT NULL,
+  `Id` int(30) NOT NULL,
   `Numero De Guia` varchar(20) NOT NULL,
   `Bodega` varchar(20) NOT NULL,
   `Ruta` varchar(20) NOT NULL,
@@ -229,8 +229,8 @@ INSERT INTO `inventario` (`id`, `Color`, `Diseño`, `Calidad`, `Tamaño`, `Stock
 DROP TABLE IF EXISTS `inventario_y_proveedor`;
 
 CREATE TABLE `inventario_y_proveedor` (
-  `id_proveedor` int(15) NOT NULL,
-  `id_inventario` int(15) NOT NULL,
+  `id_proveedor` int(30) NOT NULL,
+  `id_inventario` int(30) NOT NULL,
   `costo` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -250,11 +250,11 @@ INSERT INTO `inventario_y_proveedor` (`id_proveedor`, `id_inventario`, `costo`) 
 DROP TABLE IF EXISTS `pagos`;
 
 CREATE TABLE `pagos` (
-  `Id` int(11) NOT NULL,
+  `Id` int(30) NOT NULL,
   `Fecha Pagos` datetime(6) NOT NULL,
   `Puntos De Pago` varchar(10) NOT NULL,
-  `ID_Cliente` int(11) NOT NULL,
-  `ID_Envios` int(11) NOT NULL
+  `ID_Cliente` int(30) NOT NULL,
+  `ID_Envios` int(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -266,7 +266,7 @@ CREATE TABLE `pagos` (
 DROP TABLE IF EXISTS `pedidos`;
 
 CREATE TABLE `pedidos` (
-  `Id` int(11) NOT NULL,
+  `Id` int(30) NOT NULL,
   `Fecha Realizacion` datetime(6) NOT NULL,
   `Estado` varchar(20) NOT NULL,
   `Total` float NOT NULL,
